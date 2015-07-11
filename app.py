@@ -22,10 +22,6 @@ if os.environ.get('DEBUG') == 'True':
 else:
   DEBUG = False
 
-bugsnag.configure(
-  api_key = "1d3ac292042ce89cc96685e16164e61e"
-)
-
 MONGO_URL = os.environ.get('MONGOHQ_URL')
 if MONGO_URL:
   client = MongoClient(MONGO_URL)
