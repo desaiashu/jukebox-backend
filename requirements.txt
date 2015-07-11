@@ -1,7 +1,13 @@
+APNSWrapper==0.6.1
 Flask==0.10.1
 Jinja2==2.7.3
 MarkupSafe==0.23
+WebOb==1.4.1
 Werkzeug==0.10.4
+bugsnag==2.3.1
+docutils==0.12
 gunicorn==19.3.0
 itsdangerous==0.24
+newrelic==2.52.0.40
+pymongo==3.0.3
 wsgiref==0.1.2
