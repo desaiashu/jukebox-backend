@@ -45,6 +45,11 @@ else:
 def base():
     return 'Welcome to Jambox :)'
 
+@app.route('/bugsnag')
+def bugsnag():
+	bugsnag.notify(Exception("Test Error"))
+	return 'yay'
+
 @app.route('/except')
 def exceptit():
 	return 's'+5
