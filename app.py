@@ -39,7 +39,7 @@ app = Flask(__name__)
 if DEBUG:
   app.debug = True
 else:
-	handle_exceptions(app)
+  handle_exceptions(app)
 
 @app.route('/')
 def base():
