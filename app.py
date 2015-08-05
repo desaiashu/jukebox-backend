@@ -1,6 +1,6 @@
 import os
 import time
-from flask import Flask
+from functools import wraps
 import bugsnag
 from bugsnag.flask import handle_exceptions
 from urlparse import urlparse
@@ -57,8 +57,8 @@ def base():
 #index - by phone number - unique
 @app.route('/join', methods=['POST'])
 def join():
-  params = request.form
-  phone_number = params['phone_number']
+  phone_number = request.json['phone_number']
+  #TODO create custom code
   code = "foobar"
   users.update({'phone_number':phone_number}, {'$push':{'code':code}}, upsert=True)
   send_sms(phone_number, "your auth code is " + code)
@@ -68,22 +68,19 @@ def join():
 #params - phone number, code
 #response - success/failure
 @app.route('/confirm', methods=['POST'])
+@authenticate
 def confirm():
-  params = request.form
-  return jsonify({'result':authenticate(params['phone_number'], params['code'])})
+  return jsonify({'result':True})
 
 #retrieve list of songs sent or shared by user (can this be done using one or query? should these be kept separate?)
 #future, add pagination
 #params - phone number, code, last_updated
 #response - reverse chronological list of items
-@app.route('/inbox', methods=['POST'])
+@app.route('/inbox')
+@authenticate
 def inbox():
-  params = request.form
-  phone_number = params['phone_number']
-  if not authenticate(phone_number, params['code']): 
-    return jsonify({'result':False})
   inbox = []
-  for song in songs.find(query_for_songs(phone_number, params['last_updated'])).sort('date', -1).limit(-100):
+  for song in songs.find(query_for_inbox(request.json['phone_number'], request.json['last_updated'])).sort('date', -1).limit(-100):
     del song['_id']
     inbox.append(song)
   return jsonify({'inbox':inbox})
@@ -93,16 +90,13 @@ def inbox():
 #params - phone number, code, songID/URL, title, artist, array of recipients, timestamp
 #response - success
 @app.route('/share', methods=['POST'])
+@authenticate
 def share():
-  params = request.form
-  phone_number = params['phone_number']
-  if not authenticate(phone_number, params['code']):
-    return jsonify({'result':False})
+  song = request.json
 
-  song = params.to_dict()
   recipients = song['recipients'].split(',')
   del song['recipients']
-  song['sender'] = phone_number
+  song['sender'] = song['phone_number']
   del song['phone_number']
   del song['code']
 
@@ -111,14 +105,14 @@ def share():
   del song['sender_name']
 
   song_copies = []
-  for r in recipients:
-    song['recipient'] = r
+  for recipient in recipients:
+    song['recipient'] = recipient
     song_copies.append(song)
     song = song.copy()
-    if user_exists(r):
-      send_push(r, push_message, song)
+    if user_exists(recipient):
+      send_push(recipient, push_message, song)
     else: #should probably batch these? or queue them? use url shortner?
-      send_sms(r, sms_message)
+      send_sms(recipient, sms_message)
 
   songs.insert(song_copies)
   return jsonify({'result':True})
@@ -127,32 +121,31 @@ def share():
 #params - phone number, code, songID/URL, sender, timestamp
 #response - success
 @app.route('/listen', methods=['POST'])
+@authenticate
 def listen():
-  params = request.form
-  phone_number = params['phone_number']
-  if not authenticate(phone_number, params['code']):
-    return jsonify({'result':False})
-  songs.update({'sender':params['sender'], 'recipient':phone_number, 'yt_id':params['yt_id'], 'date':params['date']}, {'$set':{'listen':True, 'updated':timestamp()}})
+  songs.update(query_for_song(request.json), {'$set':{'listen':True, 'updated':timestamp()}})
   return jsonify({'result':True})
 
 #add love:True to item
 #params - phone number, code, songID/URL, sender, timestamp
 #response - success
 @app.route('/love', methods=['POST'])
+@authenticate
 def love():
-  params = request.form
-  phone_number = params['phone_number']
-  if not authenticate(phone_number, params['code']):
-    return jsonify({'result':False})
-  songs.update({'sender':params['sender'], 'recipient':phone_number, 'yt_id':params['yt_id'], 'date':params['date']}, {'$set':{'love':True, 'updated':timestamp()}})
+  songs.update(query_for_song(request.json), {'$set':{'love':True, 'updated':timestamp()}})
   return jsonify({'result':True})
 
 #test if code matches any of the codes
 #index, by phone number and code(array)
-def authenticate(phone_number, code):
-  if users.find({'phone_number':phone_number, 'code':code}).count():
-    return True
-  return False
+def authenticate(f):
+  @wraps(f)
+  def decorated_function(*args, **kwargs):
+    params = request.json
+    if not users.find({'phone_number':params['phone_number'], 'code':params['code']}).count():
+      return abort(401)
+    else:
+      return f(*args, **kwargs)  
+    return decorated_function
 
 def user_exists(phone_number):
   if users.find({'phone_number':phone_number}).count():
@@ -196,5 +189,8 @@ def send_push_background(recipient, text, data):
 def timestamp():
   return str(time.time())
 
-def query_for_songs(phone_number, last_updated):
+def query_for_inbox(phone_number, last_updated):
   return {'$or':[{'sender':phone_number}, {'recipient':phone_number}], 'updated':{'$gt':last_updated}}
+
+def query_for_song(song):
+  return {'sender':song['sender'], 'recipient':song['phone_number'], 'yt_id':song['yt_id'], 'date':song['date']}
