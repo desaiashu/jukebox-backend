@@ -100,22 +100,19 @@ def share():
     return jsonify({'result':False})
 
   song = params.to_dict()
-  recipients = params.getlist('recipients')
+  recipients = song['recipients'].split(',')
   del song['recipients']
   song['sender'] = phone_number
   del song['phone_number']
   del song['code']
 
   push_message = song['sender_name'] + ' thought you would like ' + song['title'] + ' by ' + song['artist'] + ' :)'
-  sms_message = push_message + '\nListen now: http://youtu.be/' + song['yt_id'] + ' \n\nDownload Jambox to send songs to friends - www.jambo.xxx'
+  sms_message = push_message + '\nListen now: http://youtu.be/' + song['yt_id'] + ' \n\nDownload Jukebox to send songs to friends - jkbx.es'
   del song['sender_name']
 
-  timestamp = timestamp()
   song_copies = []
   for r in recipients:
     song['recipient'] = r
-    song['date'] = timestamp
-    song['updated'] = timestamp
     song_copies.append(song)
     song = song.copy()
     if user_exists(r):
