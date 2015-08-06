@@ -46,6 +46,15 @@ else:
 users = db.users
 songs = db.songs
 
+#index, by phone number and code(array)
+def authenticate(f):
+  @wraps(f)
+  def decorated_function(*args, **kwargs):
+    if not users.find({'phone_number':request.json['phone_number'], 'code':request.json['code']}).count():
+      return abort(401)
+    return f(*args, **kwargs)  
+  return decorated_function
+
 @app.route('/')
 def base():
   return 'Welcome to Jukebox :)'
@@ -72,15 +81,22 @@ def join():
 def confirm():
   return jsonify({'result':True})
 
+@app.route('/pushtoken', methods=['POST'])
+@authenticate
+def pushtoken():
+  users.update({'phone_number':request.json['phone_number']}, {'$push':{'push_token':request.json['push_token']}})
+  return jsonify({'result':True})
+
 #retrieve list of songs sent or shared by user (can this be done using one or query? should these be kept separate?)
 #future, add pagination
 #params - phone number, code, last_updated
 #response - reverse chronological list of items
-@app.route('/inbox')
+@app.route('/inbox', methods=['POST'])
 @authenticate
 def inbox():
   inbox = []
   for song in songs.find(query_for_inbox(request.json['phone_number'], request.json['last_updated'])).sort('date', -1).limit(-100):
+    song['id'] = str(song['_id'])
     del song['_id']
     inbox.append(song)
   return jsonify({'inbox':inbox})
@@ -123,7 +139,7 @@ def share():
 @app.route('/listen', methods=['POST'])
 @authenticate
 def listen():
-  songs.update(query_for_song(request.json), {'$set':{'listen':True, 'updated':timestamp()}})
+  songs.update({'_id':ObjectId(request.json['id'])}, {'$set':{'listen':True, 'updated':timestamp()}})
   return jsonify({'result':True})
 
 #add love:True to item
@@ -132,20 +148,8 @@ def listen():
 @app.route('/love', methods=['POST'])
 @authenticate
 def love():
-  songs.update(query_for_song(request.json), {'$set':{'love':True, 'updated':timestamp()}})
+  songs.update({'_id':ObjectId(request.json['id'])}, {'$set':{'love':True, 'updated':timestamp()}})
   return jsonify({'result':True})
-
-#test if code matches any of the codes
-#index, by phone number and code(array)
-def authenticate(f):
-  @wraps(f)
-  def decorated_function(*args, **kwargs):
-    params = request.json
-    if not users.find({'phone_number':params['phone_number'], 'code':params['code']}).count():
-      return abort(401)
-    else:
-      return f(*args, **kwargs)  
-    return decorated_function
 
 def user_exists(phone_number):
   if users.find({'phone_number':phone_number}).count():
