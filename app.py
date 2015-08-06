@@ -163,6 +163,13 @@ def send_sms(phone_number, message):
 def send_sms_background(phone_number, message):
   twilio.messages.create(to=phone_number, from_='+16502521370', body=message)
 
+#add better error handling if user provided a bad number
+# def send_sms_safe(phone_number, message):
+#   try:
+#     twilio.messages.create(to=phone_number, from_='+16502521370', body=message)
+#   except twilio.TwilioRestException as e:
+#     return e
+
 #send push notification
 def send_push(recipient, text, data):
   p = multiprocessing.Process(target=send_push_background, args=(recipient, text, data))
