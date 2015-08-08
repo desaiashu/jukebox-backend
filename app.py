@@ -200,7 +200,7 @@ def send_push(recipient, text, badge, data):
   p.start()
 
 def send_push_background(tokens, text, badge, data):
-  wrapper = APNSNotificationWrapper(('static/pushcerts/prod_push_cert.p12'), True)
+  wrapper = APNSNotificationWrapper(('static/JukeboxBetaPush.pem'), False)
   for deviceToken in tokens:
     message = APNSNotification()
     message.tokenHex(deviceToken)
