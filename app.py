@@ -20,10 +20,7 @@ from urlparse import urlparse
 from pymongo import MongoClient
 from pymongo import ReturnDocument
 from bson.objectid import ObjectId
-from APNSWrapper import APNSAlert
-from APNSWrapper import APNSProperty
-from APNSWrapper import APNSNotification
-from APNSWrapper import APNSNotificationWrapper
+from apns import APNs, Frame, Payload
 from twilio.rest import TwilioRestClient
 from bugsnag.flask import handle_exceptions
 
@@ -40,9 +37,14 @@ else:
   mongo_client = MongoClient('localhost', 27017)
   db = mongo_client['jukebox']
 
+users = db.users
+songs = db.songs
+
 TWILIO_SID = os.environ.get('TWILIO_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 twilio = TwilioRestClient(TWILIO_SID, TWILIO_AUTH_TOKEN) 
+
+apns = APNs(use_sandbox=False, cert_file='static/JukeboxBetaPush.pem', key_file='static/JukeboxBetaPush.pem')
 
 app = Flask(__name__)
 
@@ -50,9 +52,6 @@ if DEBUG:
   app.debug = True
 else:
   handle_exceptions(app)
-
-users = db.users
-songs = db.songs
 
 
 #could pass through user object since most functions use it
@@ -70,6 +69,11 @@ def base():
   url = 'itms-services://?action=download-manifest&url=' + urllib.quote('https://www.jkbx.es/static/jukebox.plist')
   pic = 'https://s3.amazonaws.com/mgwu-misc/jukebox/jukebox.png'
   return render_template('download.html', title='Jukebox', link=url, picture=pic)
+
+@app.route('/testpush')
+def testpush():
+  send_push_background(['6d64369b6e4c2cf4ad045fe164fb780824bab9a5581dac2422a8c6c56079e01b'], 'yay', 1, None)
+  return 'yay'
 
 
 @app.route('/version')
@@ -134,6 +138,7 @@ def share():
   sms_message = push_message + '\nListen now: http://youtu.be/' + song['yt_id'] + ' \n\nDownload Jukebox to send songs to friends - jkbx.es'
   del song['sender_name']
 
+  songs_to_return = []
   for recipient in recipients:
     song = song.copy()
     song['recipient'] = recipient
@@ -141,6 +146,7 @@ def share():
     songs.insert(song)
     song['id'] = str(song['_id'])
     del song['_id']
+    songs_to_return.append(song)
 
     recipient_user = users.find_one_and_update({'phone_number':recipient}, {'$inc':{'badge':1}}, return_document=ReturnDocument.AFTER)
     if recipient_user and 'tokens' in recipient_user:
@@ -148,7 +154,7 @@ def share():
     else:
       print send_sms(recipient, sms_message)
 
-  return jsonify({'songs':song_copies})
+  return jsonify({'songs':songs_to_return})
 
 
 @app.route('/listen', methods=['POST'])
@@ -203,27 +209,19 @@ def send_push(recipient, text, badge, data):
   p.start()
 
 def send_push_background(tokens, text, badge, data):
-  wrapper = APNSNotificationWrapper(('static/JukeboxBetaPush.pem'), False)
+  frame = Frame()
+  identifier = 1
+  expiry = time.time()+3600
+  priority = 10
   for deviceToken in tokens:
-    message = APNSNotification()
-    message.tokenHex(deviceToken)
+    sound = None
     if text:
-      alert = APNSAlert()
-      alert.body(str(text))
-      message.alert(alert)
-      message.sound()
-    if badge:
-      message.badge(badge)
-    if data:
-      for key in data:
-        if isinstance(data[key], Number):
-          prop = APNSProperty(str(key), data[key])
-          message.appendProperty(prop)
-        elif isinstance(data[key], basestring):
-          prop = APNSProperty(str(key), str(data[key]))
-          message.appendProperty(prop)
-    wrapper.append(message)
-  wrapper.notify()
+      sound = "default"
+    if not data:
+      data = {}
+    payload = Payload(alert=text, sound=sound, badge=badge, custom=data)
+    frame.add_item(deviceToken, payload, identifier, expiry, priority)
+  apns.gateway_server.send_notification_multiple(frame)
 
 
 def timestamp():
