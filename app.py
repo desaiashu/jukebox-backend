@@ -1,26 +1,30 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import os
 import time
-from functools import wraps
 import string
 import random
+import urllib
+import multiprocessing
+from flask import Flask
+from flask import abort
+from flask import request
+from flask import jsonify
+from flask import Response
+from flask import redirect
+from flask import render_template
 from numbers import Number
+from functools import wraps
 from urlparse import urlparse
 from pymongo import MongoClient
 from pymongo import ReturnDocument
 from bson.objectid import ObjectId
-from flask import Flask
-from flask import abort
-from flask import request
-from flask import render_template
-from flask import Response
-from flask import redirect
-from flask import jsonify
-from twilio.rest import TwilioRestClient
-import multiprocessing
-from APNSWrapper import APNSNotification
-from APNSWrapper import APNSNotificationWrapper
 from APNSWrapper import APNSAlert
 from APNSWrapper import APNSProperty
+from APNSWrapper import APNSNotification
+from APNSWrapper import APNSNotificationWrapper
+from twilio.rest import TwilioRestClient
 from bugsnag.flask import handle_exceptions
 
 if os.environ.get('DEBUG') == 'True':
@@ -63,12 +67,14 @@ def authenticate(f):
 
 @app.route('/')
 def base():
-  return 'Welcome to Jukebox :)'
+  url = 'itms-services://?action=download-manifest&url=' + urllib.quote('https://s3.amazonaws.com/mgwu-misc/jukebox/jukebox.plist')
+  pic = 'https://s3.amazonaws.com/mgwu-misc/jukebox/jukebox.png'
+  return render_template('download.html', title='Jukebox', link=url, picture=pic)
 
 
 @app.route('/version')
 def version():
-  return jsonify({'version':'0.438', 'forced':True, 'url':'http://www.jkbx.es'})
+  return jsonify({'version':'0.463', 'forced':True, 'url':'http://www.jkbx.es'})
 
 
 @app.route('/join', methods=['POST'])
@@ -149,7 +155,7 @@ def listen():
   songs.update({'_id':ObjectId(song['id'])}, {'$set':{'listen':True, 'updated':timestamp()}})
 
   push_message = song['listener_name'] + ' listened to ' + song['title'] + ' by ' + song['artist'] + ' :)'
-  sender = users.find_one({'phone_number':song['sender']}})
+  sender = users.find_one({'phone_number':song['sender']})
   if 'tokens' in sender:
     send_push(sender['tokens'], push_message, None, {'listen':song['id']})
 
@@ -167,7 +173,7 @@ def love():
   songs.update({'_id':ObjectId(request.json['id'])}, {'$set':{'love':True, 'updated':timestamp()}})
 
   push_message = song['lover_name'] + ' listened to ' + song['title'] + ' by ' + song['artist'] + ' :)'
-  sender = users.find_one({'phone_number':song['sender']}})
+  sender = users.find_one({'phone_number':song['sender']})
   if 'tokens' in sender:
     send_push(sender['tokens'], push_message, None, {'listen':song['id']})
 
