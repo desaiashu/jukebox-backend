@@ -42,9 +42,7 @@ songs = db.songs
 
 TWILIO_SID = os.environ.get('TWILIO_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
-twilio = TwilioRestClient(TWILIO_SID, TWILIO_AUTH_TOKEN) 
-
-apns = APNs(use_sandbox=False, cert_file='static/JukeboxBetaPush.pem', key_file='static/JukeboxBetaPush.pem')
+twilio = TwilioRestClient(TWILIO_SID, TWILIO_AUTH_TOKEN)
 
 app = Flask(__name__)
 
@@ -209,6 +207,7 @@ def send_push(recipient, text, badge, data):
   p.start()
 
 def send_push_background(tokens, text, badge, data):
+  apns = APNs(use_sandbox=False, cert_file='static/JukeboxBetaPush.pem', key_file='static/JukeboxBetaPush.pem')
   frame = Frame()
   identifier = 1
   expiry = time.time()+3600
