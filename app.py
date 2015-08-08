@@ -243,6 +243,6 @@ def create_ashus_songs(recipient):
     song['recipient'] = recipient
     song['date'] = timestamp()+i
     song['updated'] = song['date']
-    songs.insert(song)
+    songs.save(song)
     i+=1
 
