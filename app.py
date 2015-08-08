@@ -67,7 +67,7 @@ def authenticate(f):
 
 @app.route('/')
 def base():
-  url = 'itms-services://?action=download-manifest&url=' + urllib.quote('https://s3.amazonaws.com/mgwu-misc/jukebox/jukebox.plist')
+  url = 'https://jkbx.es/download'
   pic = 'https://s3.amazonaws.com/mgwu-misc/jukebox/jukebox.png'
   return render_template('download.html', title='Jukebox', link=url, picture=pic)
 
