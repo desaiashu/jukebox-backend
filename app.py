@@ -70,7 +70,9 @@ def base():
 
 @app.route('/testpush')
 def testpush():
-  send_push(['6d64369b6e4c2cf4ad045fe164fb780824bab9a5581dac2422a8c6c56079e01b'], 'yay', 1, None)
+  listener = users.find_one({'phone_number':'+16504305130'})
+  if 'push_token' in listener:
+    send_push(listener['push_token'], None, listener['push_badge'], None)
   return 'yay'
 
 
