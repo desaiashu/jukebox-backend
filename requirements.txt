@@ -1,4 +1,4 @@
-APNSWrapper==0.6.2
+git+git://github.com/desaiashu/apns-python-wrapper
 Flask==0.10.1
 Jinja2==2.7.3
 MarkupSafe==0.23
