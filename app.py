@@ -81,7 +81,7 @@ def version():
 def join():
   phone_number = request.json['phone_number']
   code = ''.join(random.choice(string.digits) for _ in range(6))
-  user = users.find_one_and_update({'phone_number':phone_number}, {'$push':{'code':code}}, upsert=True)
+  user = users.find_one_and_update({'phone_number':phone_number}, {'$push':{'code':code}}, upsert=True, return_document=ReturnDocument.AFTER)
   if not 'badge' in user:
     create_ashus_songs(phone_number)
     user['badge'] = 5
