@@ -99,7 +99,8 @@ def confirm():
 @app.route('/pushtoken', methods=['POST'])
 @authenticate
 def pushtoken():
-  users.update({'phone_number':request.json['phone_number']}, {'$addToSet':{'push_token':request.json['push_token']}})
+  user = users.find_one_and_update({'phone_number':request.json['phone_number']}, {'$addToSet':{'push_token':request.json['push_token']}})
+  send_push_background(request.json['push_token'], None, user['badge'], None)
   return jsonify({'success':True})
 
 
@@ -138,13 +139,15 @@ def share():
     song['recipient'] = recipient
     song['updated'] = timestamp()
     songs.insert(song)
-    s['id'] = str(s['_id'])
-    del s['_id']
+    song['id'] = str(song['_id'])
+    del song['_id']
+
     recipient_user = users.find_one_and_update({'phone_number':recipient}, {'$inc':{'badge':1}}, return_document=ReturnDocument.AFTER)
     if recipient_user and 'tokens' in recipient_user:
       send_push(recipient_user['tokens'], push_message, recipient_user['badge'], {'share':song})
     else:
       print send_sms(recipient, sms_message)
+
   return jsonify({'songs':song_copies})
 
 
