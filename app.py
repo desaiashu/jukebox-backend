@@ -242,7 +242,7 @@ def create_ashus_songs(recipient):
     song['sender'] = 'Ashu'
     song['recipient'] = recipient
     song['date'] = timestamp()+i
-    song['updated'] = song(date)
+    song['updated'] = song['date']
     songs.insert(song)
     i+=1
 
