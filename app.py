@@ -202,7 +202,7 @@ def send_sms_background(phone_number, message):
 #     return e
 
 
-def send_push(recipient, text, badge, data):
+def send_push(tokens, text, badge, data):
   p = multiprocessing.Process(target=send_push_background, args=(tokens, text, badge, data))
   p.start()
 
@@ -212,14 +212,14 @@ def send_push_background(tokens, text, badge, data):
   identifier = 1
   expiry = time.time()+3600
   priority = 10
-  for deviceToken in tokens:
+  for device_token in tokens:
     sound = None
     if text:
       sound = "default"
     if not data:
       data = {}
     payload = Payload(alert=text, sound=sound, badge=badge, custom=data)
-    frame.add_item(deviceToken, payload, identifier, expiry, priority)
+    frame.add_item(device_token, payload, identifier, expiry, priority)
   apns.gateway_server.send_notification_multiple(frame)
 
 
