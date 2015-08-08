@@ -70,6 +70,11 @@ def base():
   pic = 'https://s3.amazonaws.com/mgwu-misc/jukebox/jukebox.png'
   return render_template('download.html', title='Jukebox', link=url, picture=pic)
 
+@app.route('/testpush')
+def testpush():
+  send_push_background(['6d64369b6e4c2cf4ad045fe164fb780824bab9a5581dac2422a8c6c56079e01b'], 'yay', 1, None)
+  return 'yay'
+
 
 @app.route('/version')
 def version():
