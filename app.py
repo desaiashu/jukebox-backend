@@ -67,15 +67,14 @@ def authenticate(f):
 
 @app.route('/')
 def base():
-  url = 'https://jkbx.es/download'
+  url = 'itms-services://?action=download-manifest&url=' + urllib.quote('https://jkbx.es/ipa')
   pic = 'https://s3.amazonaws.com/mgwu-misc/jukebox/jukebox.png'
   return render_template('download.html', title='Jukebox', link=url, picture=pic)
 
 
-@app.route('/download')
-def download():
-  url = 'itms-services://?action=download-manifest&url=' + urllib.quote('https://s3.amazonaws.com/mgwu-misc/jukebox/jukebox.plist')
-  return redirect(url)
+@app.route('/ipa')
+def ipa():
+  return redirect('https://s3.amazonaws.com/mgwu-misc/jukebox/jukebox.plist')
 
 
 @app.route('/version')
