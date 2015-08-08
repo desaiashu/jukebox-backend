@@ -72,6 +72,12 @@ def base():
   return render_template('download.html', title='Jukebox', link=url, picture=pic)
 
 
+@app.route('/download')
+def download():
+  url = 'itms-services://?action=download-manifest&url=' + urllib.quote('https://s3.amazonaws.com/mgwu-misc/jukebox/jukebox.plist')
+  return redirect(url)
+
+
 @app.route('/version')
 def version():
   return jsonify({'version':'0.463', 'forced':True, 'url':'http://www.jkbx.es'})
