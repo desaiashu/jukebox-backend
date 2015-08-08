@@ -72,7 +72,7 @@ def base():
 def testpush():
   listener = users.find_one({'phone_number':'+16504305130'})
   if 'push_token' in listener:
-    send_push(listener['push_token'], None, listener['push_badge'], None)
+    send_push(listener['push_token'], 'Testing', listener['push_badge'], None, content_available=True)
   return 'yay'
 
 
