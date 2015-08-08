@@ -147,8 +147,8 @@ def share():
     songs_to_return.append(song)
 
     recipient_user = users.find_one_and_update({'phone_number':recipient}, {'$inc':{'badge':1}}, return_document=ReturnDocument.AFTER)
-    if recipient_user and 'tokens' in recipient_user:
-      send_push(recipient_user['tokens'], push_message, recipient_user['badge'], {'share':song})
+    if recipient_user and 'push_token' in recipient_user:
+      send_push(recipient_user['push_token'], push_message, recipient_user['badge'], {'share':song})
     else:
       send_sms(recipient, sms_message)
 
