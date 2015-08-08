@@ -137,7 +137,7 @@ def share():
     song = song.copy()
     song['recipient'] = recipient
     song['updated'] = timestamp()
-    songs.insert(song) 
+    songs.insert(song)
     s['id'] = str(s['_id'])
     del s['_id']
     recipient_user = users.find_one_and_update({'phone_number':recipient}, {'$inc':{'badge':1}}, return_document=ReturnDocument.AFTER)
@@ -232,17 +232,17 @@ def query_for_inbox(phone_number, last_updated):
 
 
 def create_ashus_songs(recipient):
-  songs = [{'title':'Taro', 'artist':'Alt-J (∆)', 'yt_id':'S3fTw_D3l10'},
+  ashus_songs = [{'title':'Taro', 'artist':'Alt-J (∆)', 'yt_id':'S3fTw_D3l10'},
            {'title':'From Eden', 'artist':'Hozier', 'yt_id':'JmWbBUxSNUU'},
            {'title':'Uncantena', 'artist':'Sylvan Esso', 'yt_id':'BHBgdiSsTY8'},
            {'title':'1998', 'artist':'Chet Faker', 'yt_id':'EIQQnoeepgU'},
            {'title':'Toes', 'artist':'Glass Animals', 'yt_id':'z4ifSSg1HAo'}]
   i = 0
-  for song in songs:
+  for song in ashus_songs:
     song['sender'] = 'Ashu'
     song['recipient'] = recipient
     song['date'] = timestamp()+i
     song['updated'] = song['date']
-    songs.save(song)
+    songs.insert(song)
     i+=1
 
