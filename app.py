@@ -150,7 +150,7 @@ def share():
     if recipient_user and 'tokens' in recipient_user:
       send_push(recipient_user['tokens'], push_message, recipient_user['badge'], {'share':song})
     else:
-      print 'yay' #send_sms(recipient, sms_message)
+      print send_sms(recipient, sms_message)
   return jsonify({'songs':song_copies})
 
 
