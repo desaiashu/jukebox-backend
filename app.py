@@ -84,9 +84,9 @@ def join():
   phone_number = request.json['phone_number']
   code = ''.join(random.choice(string.digits) for _ in range(6))
   user = users.find_one_and_update({'phone_number':phone_number}, {'$push':{'code':code}}, upsert=True, return_document=ReturnDocument.AFTER)
-  if not 'badge' in user:
+  if not 'push_badge' in user:
     create_ashus_songs(phone_number)
-    user['badge'] = 5
+    user['push_badge'] = 5
     users.save(user)
   send_sms(phone_number, 'Auth code is ' + code)
   return jsonify({'success':True})
@@ -102,7 +102,7 @@ def confirm():
 @authenticate
 def pushtoken():
   user = users.find_one_and_update({'phone_number':request.json['phone_number']}, {'$addToSet':{'push_token':request.json['push_token']}}, return_document=ReturnDocument.AFTER)
-  send_push_background(user['push_token'], None, user['badge'], None)
+  send_push_background(user['push_token'], None, user['push_badge'], None)
   return jsonify({'success':True})
 
 
@@ -146,9 +146,9 @@ def share():
     del song['_id']
     songs_to_return.append(song)
 
-    recipient_user = users.find_one_and_update({'phone_number':recipient}, {'$inc':{'badge':1}}, return_document=ReturnDocument.AFTER)
+    recipient_user = users.find_one_and_update({'phone_number':recipient}, {'$inc':{'push_badge':1}}, return_document=ReturnDocument.AFTER)
     if recipient_user and 'push_token' in recipient_user:
-      send_push(recipient_user['push_token'], push_message, recipient_user['badge'], {'share':song})
+      send_push(recipient_user['push_token'], push_message, recipient_user['push_badge'], {'share':song})
     else:
       send_sms(recipient, sms_message)
 
@@ -166,9 +166,9 @@ def listen():
   if 'tokens' in sender:
     send_push(sender['tokens'], push_message, None, {'listen':song['id']})
 
-  listener = users.find_one_and_update({'phone_number':song['phone_number']}, {'$inc':{'badge':-1}}, return_document=ReturnDocument.AFTER)
+  listener = users.find_one_and_update({'phone_number':song['phone_number']}, {'$inc':{'push_badge':-1}}, return_document=ReturnDocument.AFTER)
   if 'tokens' in listener:
-    send_push(listener['tokens'], None, listener['badge'], None)
+    send_push(listener['tokens'], None, listener['push_badge'], None)
 
   return jsonify({'success':True})
 
