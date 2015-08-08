@@ -78,7 +78,7 @@ def testpush():
 
 @app.route('/version')
 def version():
-  return jsonify({'version':'0.463', 'forced':True, 'url':'http://www.jkbx.es'})
+  return jsonify({'version':'0.465', 'forced':False, 'url':'https://www.jkbx.es'})
 
 
 @app.route('/join', methods=['POST'])
