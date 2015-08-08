@@ -163,12 +163,12 @@ def listen():
 
   push_message = song['listener_name'] + ' listened to ' + song['title'] + ' by ' + song['artist'] + ' :)'
   sender = users.find_one({'phone_number':song['sender']})
-  if 'tokens' in sender:
-    send_push(sender['tokens'], push_message, None, {'listen':song['id']})
+  if 'push_token' in sender:
+    send_push(sender['push_token'], push_message, None, {'listen':song['id']})
 
   listener = users.find_one_and_update({'phone_number':song['phone_number']}, {'$inc':{'push_badge':-1}}, return_document=ReturnDocument.AFTER)
-  if 'tokens' in listener:
-    send_push(listener['tokens'], None, listener['push_badge'], None)
+  if 'push_token' in listener:
+    send_push(listener['push_token'], None, listener['push_badge'], None)
 
   return jsonify({'success':True})
 
@@ -181,8 +181,8 @@ def love():
 
   push_message = song['lover_name'] + ' listened to ' + song['title'] + ' by ' + song['artist'] + ' :)'
   sender = users.find_one({'phone_number':song['sender']})
-  if 'tokens' in sender:
-    send_push(sender['tokens'], push_message, None, {'listen':song['id']})
+  if 'push_token' in sender:
+    send_push(sender['push_token'], push_message, None, {'listen':song['id']})
 
   return jsonify({'success':True})
 
