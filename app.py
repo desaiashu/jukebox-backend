@@ -238,11 +238,12 @@ def create_ashus_songs(recipient):
            {'title':'1998', 'artist':'Chet Faker', 'yt_id':'EIQQnoeepgU'},
            {'title':'Toes', 'artist':'Glass Animals', 'yt_id':'z4ifSSg1HAo'}]
   i = 0
+  now = timestamp()
   for song in ashus_songs:
     song['sender'] = 'Ashu'
     song['recipient'] = recipient
-    song['date'] = timestamp()+i
+    song['date'] = now+i
     song['updated'] = song['date']
-    songs.insert(song)
     i+=1
+  songs.insert(ashus_songs)
 
