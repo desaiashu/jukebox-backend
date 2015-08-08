@@ -72,7 +72,7 @@ def base():
 def testpush():
   listener = users.find_one({'phone_number':'+16504305130'})
   if 'push_token' in listener:
-    send_push(listener['push_token'], None, listener['push_badge'], None)
+    send_push(listener['push_token'], None, listener['push_badge'], None, content_available=True)
   return 'yay'
 
 
@@ -150,7 +150,7 @@ def share():
 
     recipient_user = users.find_one_and_update({'phone_number':recipient}, {'$inc':{'push_badge':1}}, return_document=ReturnDocument.AFTER)
     if recipient_user and 'push_token' in recipient_user:
-      send_push(recipient_user['push_token'], push_message, recipient_user['push_badge'], {'share':song})
+      send_push(recipient_user['push_token'], push_message, recipient_user['push_badge'], {'share':song}, content_available=True)
     else:
       send_sms(recipient, sms_message)
 
@@ -204,11 +204,11 @@ def send_sms_background(phone_number, message):
 #     return e
 
 
-def send_push(tokens, text, badge, data):
-  p = multiprocessing.Process(target=send_push_background, args=(tokens, text, badge, data))
+def send_push(tokens, text, badge, data, content_available=False):
+  p = multiprocessing.Process(target=send_push_background, args=(tokens, text, badge, data, content_available))
   p.start()
 
-def send_push_background(tokens, text, badge, data):
+def send_push_background(tokens, text, badge, data, content_available):
   apns = APNs(use_sandbox=False, cert_file='static/JukeboxBetaPush.pem', key_file='static/JukeboxBetaPush.pem')
   frame = Frame()
   identifier = 1
@@ -220,7 +220,7 @@ def send_push_background(tokens, text, badge, data):
       sound = "default"
     if not data:
       data = {}
-    payload = Payload(alert=text, sound=sound, badge=badge, custom=data)
+    payload = Payload(alert=text, sound=sound, badge=badge, custom=data, content_available=content_available)
     frame.add_item(device_token, payload, identifier, expiry, priority)
   apns.gateway_server.send_notification_multiple(frame)
 
