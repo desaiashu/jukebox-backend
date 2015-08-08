@@ -100,7 +100,7 @@ def confirm():
 @authenticate
 def pushtoken():
   user = users.find_one_and_update({'phone_number':request.json['phone_number']}, {'$addToSet':{'push_token':request.json['push_token']}})
-  send_push_background(request.json['push_token'], None, user['badge'], None)
+  send_push_background(user['push_token'], None, user['badge'], None)
   return jsonify({'success':True})
 
 
