@@ -1,10 +1,13 @@
 import os
 import time
 from functools import wraps
-import bugsnag
-from bugsnag.flask import handle_exceptions
+import string
+import random
+from numbers import Number
 from urlparse import urlparse
 from pymongo import MongoClient
+from pymongo import ReturnDocument
+from bson.objectid import ObjectId
 from flask import Flask
 from flask import abort
 from flask import request
@@ -18,6 +21,7 @@ from APNSWrapper import APNSNotification
 from APNSWrapper import APNSNotificationWrapper
 from APNSWrapper import APNSAlert
 from APNSWrapper import APNSProperty
+from bugsnag.flask import handle_exceptions
 
 if os.environ.get('DEBUG') == 'True':
   DEBUG = True
@@ -46,7 +50,8 @@ else:
 users = db.users
 songs = db.songs
 
-#index, by phone number and code(array)
+
+#could pass through user object since most functions use it
 def authenticate(f):
   @wraps(f)
   def decorated_function(*args, **kwargs):
@@ -55,56 +60,58 @@ def authenticate(f):
     return f(*args, **kwargs)  
   return decorated_function
 
+
 @app.route('/')
 def base():
   return 'Welcome to Jukebox :)'
 
-#when user gives phone number
-#if phone number exists as a user, just send confirmation code
-#params - phone number
-#response - success
-#index - by phone number - unique
+
+@app.route('/version')
+def version():
+  return jsonify({'version':'0.438', 'forced':True, 'url':'http://www.jkbx.es'})
+
+
 @app.route('/join', methods=['POST'])
 def join():
   phone_number = request.json['phone_number']
-  #TODO create custom code
-  code = "foobar"
-  users.update({'phone_number':phone_number}, {'$push':{'code':code}}, upsert=True)
-  send_sms(phone_number, "your auth code is " + code)
-  return jsonify({'result':True})
+  code = ''.join(random.choice(string.digits) for _ in range(6))
+  user = users.find_one_and_modify({'phone_number':phone_number}, {'$push':{'code':code}}, upsert=True)
+  if not 'badge' in user:
+    create_ashus_songs(phone_number)
+    user['badge'] = 5
+    users.save(user)
+  send_sms(phone_number, 'Auth code is ' + code)
+  return jsonify({'success':True})
 
-#confirm device w/ code
-#params - phone number, code
-#response - success/failure
+
 @app.route('/confirm', methods=['POST'])
 @authenticate
 def confirm():
-  return jsonify({'result':True})
+  return jsonify({'success':True})
+
 
 @app.route('/pushtoken', methods=['POST'])
 @authenticate
 def pushtoken():
-  users.update({'phone_number':request.json['phone_number']}, {'$push':{'push_token':request.json['push_token']}})
-  return jsonify({'result':True})
+  users.update({'phone_number':request.json['phone_number']}, {'$addToSet':{'push_token':request.json['push_token']}})
+  return jsonify({'success':True})
 
-#retrieve list of songs sent or shared by user (can this be done using one or query? should these be kept separate?)
-#future, add pagination
-#params - phone number, code, last_updated
-#response - reverse chronological list of items
+
 @app.route('/inbox', methods=['POST'])
 @authenticate
 def inbox():
   inbox = []
+  updated = timestamp()
   for song in songs.find(query_for_inbox(request.json['phone_number'], request.json['last_updated'])).sort('date', -1).limit(-100):
     song['id'] = str(song['_id'])
     del song['_id']
     inbox.append(song)
-  return jsonify({'inbox':inbox})
+  return jsonify({'inbox':inbox, 'updated':updated})
 
-#send song to people
-#create a new item per recipient
-#params - phone number, code, songID/URL, title, artist, array of recipients, timestamp
-#response - success
+
+#notes: 
+# batch insert could improve performance
+# queueing notifications could improve performance
 @app.route('/share', methods=['POST'])
 @authenticate
 def share():
@@ -120,41 +127,52 @@ def share():
   sms_message = push_message + '\nListen now: http://youtu.be/' + song['yt_id'] + ' \n\nDownload Jukebox to send songs to friends - jkbx.es'
   del song['sender_name']
 
-  song_copies = []
   for recipient in recipients:
-    song['recipient'] = recipient
-    song_copies.append(song)
     song = song.copy()
-    if user_exists(recipient):
-      send_push(recipient, push_message, song)
-    else: #should probably batch these? or queue them? use url shortner?
-      send_sms(recipient, sms_message)
+    song['recipient'] = recipient
+    song['updated'] = timestamp()
+    songs.insert(song) 
+    s['id'] = str(s['_id'])
+    del s['_id']
+    recipient_user = users.find_one_and_modify({'phone_number':recipient}, {'$inc':{'badge':1}}, return_document=ReturnDocument.AFTER)
+    if recipient_user and 'tokens' in recipient_user:
+      send_push(recipient_user['tokens'], push_message, recipient_user['badge'], {'share':song})
+    else:
+      print 'yay' #send_sms(recipient, sms_message)
+  return jsonify({'songs':song_copies})
 
-  songs.insert(song_copies)
-  return jsonify({'result':True})
 
-#add listen:True to item
-#params - phone number, code, songID/URL, sender, timestamp
-#response - success
 @app.route('/listen', methods=['POST'])
 @authenticate
 def listen():
-  songs.update({'_id':ObjectId(request.json['id'])}, {'$set':{'listen':True, 'updated':timestamp()}})
-  return jsonify({'result':True})
+  song = request.json
+  songs.update({'_id':ObjectId(song['id'])}, {'$set':{'listen':True, 'updated':timestamp()}})
 
-#add love:True to item
-#params - phone number, code, songID/URL, sender, timestamp
-#response - success
+  push_message = song['listener_name'] + ' listened to ' + song['title'] + ' by ' + song['artist'] + ' :)'
+  sender = users.find_one({'phone_number':song['sender']}})
+  if 'tokens' in sender:
+    send_push(sender['tokens'], push_message, None, {'listen':song['id']})
+
+  listener = users.find_one_and_modify({'phone_number':song['phone_number']}, {'$inc':{'badge':-1}}, return_document=ReturnDocument.AFTER)
+  if 'tokens' in listener:
+    send_push(listener['tokens'], None, listener['badge'], None)
+
+  return jsonify({'success':True})
+
+
 @app.route('/love', methods=['POST'])
 @authenticate
 def love():
+  song = request.json
   songs.update({'_id':ObjectId(request.json['id'])}, {'$set':{'love':True, 'updated':timestamp()}})
-  return jsonify({'result':True})
 
-def user_exists(phone_number):
-  if users.find({'phone_number':phone_number}).count():
-    return True
-  return False
+  push_message = song['lover_name'] + ' listened to ' + song['title'] + ' by ' + song['artist'] + ' :)'
+  sender = users.find_one({'phone_number':song['sender']}})
+  if 'tokens' in sender:
+    send_push(sender['tokens'], push_message, None, {'listen':song['id']})
+
+  return jsonify({'success':True})
+
 
 def send_sms(phone_number, message):
   p = multiprocessing.Process(target=send_sms_background, args=(phone_number, message))
@@ -163,45 +181,62 @@ def send_sms(phone_number, message):
 def send_sms_background(phone_number, message):
   twilio.messages.create(to=phone_number, from_='+16502521370', body=message)
 
-#add better error handling if user provided a bad number
+#TODO add better error handling if user provided a bad number
 # def send_sms_safe(phone_number, message):
 #   try:
 #     twilio.messages.create(to=phone_number, from_='+16502521370', body=message)
 #   except twilio.TwilioRestException as e:
 #     return e
 
-#send push notification
-def send_push(recipient, text, data):
-  p = multiprocessing.Process(target=send_push_background, args=(recipient, text, data))
+
+def send_push(recipient, text, badge, data):
+  p = multiprocessing.Process(target=send_push_background, args=(tokens, text, badge, data))
   p.start()
 
-def send_push_background(recipient, text, data):
+def send_push_background(tokens, text, badge, data):
   wrapper = APNSNotificationWrapper(('static/pushcerts/prod_push_cert.p12'), True)
-  tokens = set()
-  #need to add device tokens to set
   for deviceToken in tokens:
     message = APNSNotification()
     message.tokenHex(deviceToken)
-    alert = APNSAlert()
-    alert.body(str(text))
-    message.alert(alert)
-    message.sound()
-    message.badge(badge)
-    for key in data:
-      if isinstance(data[key], Number):
-        prop = APNSProperty(str(key), data[key])
-        message.appendProperty(prop)
-      elif isinstance(data[key], basestring):
-        prop = APNSProperty(str(key), str(data[key]))
-        message.appendProperty(prop)
+    if text:
+      alert = APNSAlert()
+      alert.body(str(text))
+      message.alert(alert)
+      message.sound()
+    if badge:
+      message.badge(badge)
+    if data:
+      for key in data:
+        if isinstance(data[key], Number):
+          prop = APNSProperty(str(key), data[key])
+          message.appendProperty(prop)
+        elif isinstance(data[key], basestring):
+          prop = APNSProperty(str(key), str(data[key]))
+          message.appendProperty(prop)
     wrapper.append(message)
   wrapper.notify()
 
+
 def timestamp():
-  return str(time.time())
+  return int(time.time())
+
 
 def query_for_inbox(phone_number, last_updated):
   return {'$or':[{'sender':phone_number}, {'recipient':phone_number}], 'updated':{'$gt':last_updated}}
 
-def query_for_song(song):
-  return {'sender':song['sender'], 'recipient':song['phone_number'], 'yt_id':song['yt_id'], 'date':song['date']}
+
+def create_ashus_songs(recipient):
+  songs = [{'title':'Taro', 'artist':'Alt-J (∆)', 'yt_id':'S3fTw_D3l10'},
+           {'title':'From Eden', 'artist':'Hozier', 'yt_id':'JmWbBUxSNUU'},
+           {'title':'Uncantena', 'artist':'Sylvan Esso', 'yt_id':'BHBgdiSsTY8'},
+           {'title':'1998', 'artist':'Chet Faker', 'yt_id':'EIQQnoeepgU'},
+           {'title':'Toes', 'artist':'Glass Animals', 'yt_id':'z4ifSSg1HAo'}]
+  i = 0
+  for song in songs:
+    song['sender'] = 'Ashu'
+    song['recipient'] = recipient
+    song['date'] = timestamp()+i
+    song['updated'] = song(date)
+    songs.insert(song)
+    i+=1
+
