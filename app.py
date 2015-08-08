@@ -81,7 +81,7 @@ def version():
 def join():
   phone_number = request.json['phone_number']
   code = ''.join(random.choice(string.digits) for _ in range(6))
-  user = users.find_one_and_modify({'phone_number':phone_number}, {'$push':{'code':code}}, upsert=True)
+  user = users.find_one_and_update({'phone_number':phone_number}, {'$push':{'code':code}}, upsert=True)
   if not 'badge' in user:
     create_ashus_songs(phone_number)
     user['badge'] = 5
@@ -140,7 +140,7 @@ def share():
     songs.insert(song) 
     s['id'] = str(s['_id'])
     del s['_id']
-    recipient_user = users.find_one_and_modify({'phone_number':recipient}, {'$inc':{'badge':1}}, return_document=ReturnDocument.AFTER)
+    recipient_user = users.find_one_and_update({'phone_number':recipient}, {'$inc':{'badge':1}}, return_document=ReturnDocument.AFTER)
     if recipient_user and 'tokens' in recipient_user:
       send_push(recipient_user['tokens'], push_message, recipient_user['badge'], {'share':song})
     else:
@@ -159,7 +159,7 @@ def listen():
   if 'tokens' in sender:
     send_push(sender['tokens'], push_message, None, {'listen':song['id']})
 
-  listener = users.find_one_and_modify({'phone_number':song['phone_number']}, {'$inc':{'badge':-1}}, return_document=ReturnDocument.AFTER)
+  listener = users.find_one_and_update({'phone_number':song['phone_number']}, {'$inc':{'badge':-1}}, return_document=ReturnDocument.AFTER)
   if 'tokens' in listener:
     send_push(listener['tokens'], None, listener['badge'], None)
 
