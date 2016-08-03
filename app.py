@@ -243,14 +243,14 @@ def create_ashus_songs(recipient):
            {'title':'1998', 'artist':'Chet Faker', 'yt_id':'EIQQnoeepgU'},
            {'title':'Toes', 'artist':'Glass Animals', 'yt_id':'z4ifSSg1HAo'}]
   i = 0
-  timestamp = timestamp()
+  date = timestamp()
   song = songs.find_one({'recipient':recipient}).sort('date', 1)
   if song: #if user has already been sent a song, make created songs older
-      timestamp = song['date'] - 100
+      date = song['date'] - 100
   for song in ashus_songs:
     song['sender'] = 'Ashu'
     song['recipient'] = recipient
-    song['date'] = timestamp+i
+    song['date'] = date+i
     song['updated'] = song['date']
     i+=1
   songs.insert(ashus_songs)
