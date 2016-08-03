@@ -58,7 +58,7 @@ def authenticate(f):
   def decorated_function(*args, **kwargs):
     if not users.find({'phone_number':request.json['phone_number'], 'code':request.json['code']}).count():
       return abort(401)
-    return f(*args, **kwargs)  
+    return f(*args, **kwargs)
   return decorated_function
 
 
@@ -120,7 +120,7 @@ def inbox():
   return jsonify({'inbox':inbox, 'updated':updated})
 
 
-#notes: 
+#notes:
 # batch insert could improve performance
 # queueing notifications could improve performance
 @app.route('/share', methods=['POST'])
@@ -181,7 +181,7 @@ def love():
   song = request.json
   songs.update({'_id':ObjectId(request.json['id'])}, {'$set':{'love':True, 'updated':timestamp()}})
 
-  push_message = song['lover_name'] + ' listened to ' + song['title'] + ' by ' + song['artist'] + ' :)'
+  push_message = song['lover_name'] + ' loved ' + song['title'] + ' by ' + song['artist'] + ' :)'
   sender = users.find_one({'phone_number':song['sender']})
   if 'push_token' in sender:
     send_push(sender['push_token'], push_message, None, {'listen':song['id']})
@@ -195,6 +195,9 @@ def send_sms(phone_number, message):
 
 def send_sms_background(phone_number, message):
   twilio.messages.create(to=phone_number, from_='+16502521370', body=message)
+
+#TODO lookup numbers on twilio
+# https://www.twilio.com/lookup
 
 #TODO add better error handling if user provided a bad number
 # def send_sms_safe(phone_number, message):
@@ -240,12 +243,14 @@ def create_ashus_songs(recipient):
            {'title':'1998', 'artist':'Chet Faker', 'yt_id':'EIQQnoeepgU'},
            {'title':'Toes', 'artist':'Glass Animals', 'yt_id':'z4ifSSg1HAo'}]
   i = 0
-  now = timestamp()
+  timestamp = timestamp()
+  song = songs.find_one({'recipient':recipient}).sort('date', 1)
+  if song: #if user has already been sent a song, make created songs older
+      timestamp = song['date'] - 100
   for song in ashus_songs:
     song['sender'] = 'Ashu'
     song['recipient'] = recipient
-    song['date'] = now+i
+    song['date'] = timestamp+i
     song['updated'] = song['date']
     i+=1
   songs.insert(ashus_songs)
-
