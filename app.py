@@ -244,7 +244,7 @@ def create_ashus_songs(recipient):
            {'title':'Toes', 'artist':'Glass Animals', 'yt_id':'z4ifSSg1HAo'}]
   i = 0
   date = timestamp()
-  song = songs.find_one({'recipient':recipient}).sort('date', 1)
+  song = songs.find_one({'recipient':recipient}, sort=[('date', 1)])
   if song: #if user has already been sent a song, make created songs older
       date = song['date'] - 100
   for song in ashus_songs:
