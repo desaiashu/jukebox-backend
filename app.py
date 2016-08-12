@@ -67,7 +67,7 @@ def authenticate(f):
 @app.route('/', methods=['GET', 'POST'])
 def base():
   if request.method == 'POST':
-    email = request.form['phone']
+    phone = request.form['phone']
     notify_numbers.insert({'phone_number':phone})
     return render_template('splash.html')
   elif request.user_agent.platform in ['iphone', 'ipad']:
