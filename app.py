@@ -39,6 +39,7 @@ else:
 
 users = db.users
 songs = db.songs
+notify_emails = db.notify_emails
 
 TWILIO_SID = os.environ.get('TWILIO_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
@@ -62,11 +63,19 @@ def authenticate(f):
   return decorated_function
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def base():
-  url = 'itms-services://?action=download-manifest&url=' + urllib.quote('https://www.jkbx.es/static/jukebox.plist')
-  pic = 'https://s3.amazonaws.com/mgwu-misc/jukebox/jukebox.png'
-  return render_template('download.html', title='Jukebox', link=url, picture=pic)
+  if request.method == 'POST':
+    email = request.form['email']
+    notify_emails.insert({'email':email})
+    return render_template('splash.html')
+  elif request.user_agent.platform in ['iphone', 'ipad']:
+    url = 'itms-services://?action=download-manifest&url=' + urllib.quote('https://www.jkbx.es/static/jukebox.plist')
+    pic = 'https://s3.amazonaws.com/mgwu-misc/jukebox/jukebox.png'
+    return render_template('download.html', title='Jukebox', link=url, picture=pic)
+  else:
+    return render_template('splash.html')
+
 
 @app.route('/testpush')
 def testpush():
