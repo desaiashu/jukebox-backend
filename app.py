@@ -40,6 +40,7 @@ else:
 users = db.users
 songs = db.songs
 notify_emails = db.notify_emails
+notify_numbers = db.notify_numbers
 
 TWILIO_SID = os.environ.get('TWILIO_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
@@ -66,8 +67,8 @@ def authenticate(f):
 @app.route('/', methods=['GET', 'POST'])
 def base():
   if request.method == 'POST':
-    email = request.form['email']
-    notify_emails.insert({'email':email})
+    email = request.form['phone']
+    notify_numbers.insert({'phone_number':phone})
     return render_template('splash.html')
   elif request.user_agent.platform in ['iphone', 'ipad']:
     url = 'itms-services://?action=download-manifest&url=' + urllib.quote('https://www.jkbx.es/static/jukebox.plist')
