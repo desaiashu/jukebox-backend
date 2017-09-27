@@ -1,8 +1,7 @@
 <head>
-  <link href="https://fonts.googleapis.com/css?family=Nunito:400,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Khula:600|Teko:400,700" rel="stylesheet">
   <style type="text/css">
     html {
-        /*background: url(../static/show.jpg) no-repeat center center fixed;*/
         -webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
@@ -30,7 +29,7 @@
 .column .info {
   width:100%;
   position:relative;
-  transform: translate3d(3.5%, 20%, 0);
+  transform: translate3d(0%, 0%, 0);
 }
 
 .column img {
@@ -38,19 +37,35 @@
     position: relative;
     max-width: 60%;
     left: 50%;
-    transform: translate3d(-43.5%, 5%, 0);
+    transform: translate3d(-43.5%, 10%, 0);
 }
+
+.column .music {
+    width:100%;
+    position:relative;
+    transform: translate3d(0%, 0%, 0);
+}
+  
+.column iframe {
+      width:60%;
+      position: relative;
+      max-width: 60%;
+      height:25vw;
+      max-height:25vw;
+      left: 50%;
+      transform: translate3d(-43.5%, 42.5%, 0);
+  }
 
 .column .header {
     background-color: #fff;
     width: 57%;
-    transform: translate3d(30%, 70%, 0);
+    transform: translate3d(35%, 80%, 0);
 }
 
 .column .header h1 {
-  padding-left: 5%;
+  padding-left: 7%;
   font-size: 6vw;
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Teko', sans-serif;
   font-weight: bold;
   color: #696097;
 }
@@ -58,31 +73,29 @@
 .column .subheader {
     background-color: #fff;
     width: 87%;
-    transform: translate3d(19.25%, 60%, 0);
+    transform: translate3d(19.5%, 70%, 0);
 }
 
 .column .subheader h2 {
   padding-left: 2.25%;
-  padding-top: 1.5%;
-  padding-bottom: 1.5%;
-  font-size: 2vw;
-  font-family: 'Nunito', sans-serif;
+  font-size: 1.25vw;
+  font-family: 'Khula', sans-serif;
   font-weight: normal;
   color: #696097;
 }
-
+  
 .column input {
   background-color: #fff;
   border: none;
 
   width: 55.5%;
-  transform: translate3d(30.75%, 120%, 0);
+  transform: translate3d(30.75%, 140%, 0);
 
   padding-left: 2%;
   padding-top: 3%;
-  padding-bottom: 3%;
-  font-size: 2vw;
-  font-family: 'Nunito', sans-serif;
+  padding-bottom: 2.5%;
+  font-size: 1.25vw;
+  font-family: 'Khula', sans-serif;
   font-weight: normal;
   color: #696097;
 }
@@ -91,13 +104,13 @@
   border: none;
   background-color: #9185B9;
   width: 27%;
-  transform: translate3d(78.25%, 120%, 0);
+  transform: translate3d(78.25%, 140%, 0);
 
   padding-left: 1%;
   padding-top: 3%;
-  padding-bottom: 3%;
-  font-size: 2vw;
-  font-family: 'Nunito', sans-serif;
+  padding-bottom: 2.5%;
+  font-size: 1.25vw;
+  font-family: 'Khula', sans-serif;
   font-weight: normal;
   color: #fff;
 }
@@ -115,20 +128,23 @@
     <div class="column">
       <div class="info">
         <div class="header">
-          <h1>Jukebox</h1>
+          <h1>T&omacr;sh</h1>
         </div>
         <div class="subheader">
-          <h2>Share songs you love with people you love :)</h2>
+            <h2>We dance to socialize. We dance to exercise. We dance to find silence in our minds. We dance to contemplate our lives. We dance till sunrise.</h2>
         </div>
         <form id="form" action ="." method="post">
-          <!-- <input name="email" id="email" placeholder="Enter email"> -->
+<!--          <input name="email" id="email" placeholder="Enter email">-->
           <input name="phone" id="phone" placeholder="Enter phone number">
-          <button type="submit">Notify me</button>
+          <button type="submit">Let's Dance</button>
         </form>
       </div>
     </div>
     <div class="column">
-        <img src="../static/iphone.png"/>
+        <div class="music">
+<!--        <img src="../static/iphone.png"/>-->
+<iframe scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/342832823&amp;color=%239185B9&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true"></iframe>
+        </div>
     </div>
 </div>
 </body>

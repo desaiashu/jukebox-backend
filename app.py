@@ -41,6 +41,7 @@ users = db.users
 songs = db.songs
 notify_emails = db.notify_emails
 notify_numbers = db.notify_numbers
+toshbeats_numbers = db.toshbeats_numbers
 
 TWILIO_SID = os.environ.get('TWILIO_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
@@ -66,6 +67,8 @@ def authenticate(f):
 
 @app.route('/', methods=['GET', 'POST'])
 def base():
+  if 'toshbeats' in request.url:
+    return toshbeats()
   if request.method == 'POST':
     phone = request.form['phone']
     notify_numbers.insert({'phone_number':phone})
@@ -77,6 +80,13 @@ def base():
   else:
     return render_template('splash.html')
 
+def toshbeats():
+  if request.method == 'POST':
+    phone = request.form['phone']
+    toshbeats_numbers.insert({'phone_number':phone})
+    return render_template('toshbeats.html')
+  else:
+    return render_template('toshbeats.html')
 
 @app.route('/testpush')
 def testpush():
