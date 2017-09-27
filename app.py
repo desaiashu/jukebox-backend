@@ -72,21 +72,21 @@ def base():
   if request.method == 'POST':
     phone = request.form['phone']
     notify_numbers.insert({'phone_number':phone})
-    return render_template('splash.html')
+    return render_template('splash.html', submitted=True)
   elif request.user_agent.platform in ['iphone', 'ipad']:
     url = 'itms-services://?action=download-manifest&url=' + urllib.quote('https://www.jkbx.es/static/jukebox.plist')
     pic = 'https://s3.amazonaws.com/mgwu-misc/jukebox/jukebox.png'
     return render_template('download.html', title='Jukebox', link=url, picture=pic)
   else:
-    return render_template('splash.html')
+    return render_template('splash.html', submitted=False)
 
 def toshbeats():
   if request.method == 'POST':
     phone = request.form['phone']
     toshbeats_numbers.insert({'phone_number':phone})
-    return render_template('toshbeats.html')
+    return render_template('toshbeats.html', submitted=True)
   else:
-    return render_template('toshbeats.html')
+    return render_template('toshbeats.html', submitted=False)
 
 @app.route('/testpush')
 def testpush():

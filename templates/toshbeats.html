@@ -134,9 +134,15 @@
             <h2>We dance to socialize. We dance to exercise. We dance to find silence in our minds. We dance to contemplate our lives. We dance till sunrise.</h2>
         </div>
         <form id="form" action ="." method="post">
+          {% if submitted %}
+            <div class="subheader">
+              <h2>You'll be notified of new releases and upcoming shows</h2>
+            </div>
+          {% else %}
 <!--          <input name="email" id="email" placeholder="Enter email">-->
           <input name="phone" id="phone" placeholder="Enter phone number">
           <button type="submit">Let's Dance</button>
+          {% endif %}
         </form>
       </div>
     </div>

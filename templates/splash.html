@@ -121,9 +121,15 @@
           <h2>Share songs you love with people you love :)</h2>
         </div>
         <form id="form" action ="." method="post">
+          {% if submitted %}
+            <div class="subheader">
+              <h2>We've sent you a link to download Jukebox!</h2>
+            </div>
+          {% else %}
           <!-- <input name="email" id="email" placeholder="Enter email"> -->
-          <input name="phone" id="phone" placeholder="Enter phone number">
-          <button type="submit">Notify me</button>
+            <input name="phone" id="phone" placeholder="Enter phone number">
+            <button type="submit">Notify me</button>
+          {% endif %}
         </form>
       </div>
     </div>
