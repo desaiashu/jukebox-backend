@@ -71,6 +71,20 @@
   color: #696097;
 }
 
+.column .confirmation {
+    background-color: #fff;
+    width: 87%;
+    transform: translate3d(19.5%, 330%, 0);
+}
+
+.column .confirmation h2 {
+  padding-left: 2.25%;
+  font-size: 2vw;
+  font-family: 'Nunito', sans-serif;
+  font-weight: normal;
+  color: #696097;
+}
+
 .column input {
   background-color: #fff;
   border: none;
@@ -122,7 +136,7 @@
         </div>
         <form id="form" action ="." method="post">
           {% if submitted %}
-            <div class="subheader">
+            <div class="confirmation">
               <h2>We've sent you a link to download Jukebox!</h2>
             </div>
           {% else %}

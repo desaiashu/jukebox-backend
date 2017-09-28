@@ -81,12 +81,16 @@ def base():
     return render_template('splash.html', submitted=False)
 
 def toshbeats():
+  if request.user_agent.platform in ['iphone', 'ipad', 'android']:
+    template = "toshbeatsmobile.html"
+  else:
+    template = "toshbeats.html"
   if request.method == 'POST':
     phone = request.form['phone']
     toshbeats_numbers.insert({'phone_number':phone})
-    return render_template('toshbeats.html', submitted=True)
+    return render_template(template, submitted=True)
   else:
-    return render_template('toshbeats.html', submitted=False)
+    return render_template(template, submitted=False)
 
 @app.route('/testpush')
 def testpush():
