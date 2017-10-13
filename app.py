@@ -68,7 +68,7 @@ def authenticate(f):
 
 @app.route('/', methods=['GET', 'POST'])
 def base():
-  if 'engagesf' in request.url:
+  if 'engagesf' in request.url or 'localhost' in request.url:
     return engageSF()
   if 'toshbeats' in request.url:
     return toshbeats()
