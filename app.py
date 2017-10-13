@@ -104,6 +104,7 @@ def engageSF():
     phone = request.form['phone']
     #need to grab HTTP headers / referrer
     engagesf_signups.insert({'phone_number':phone})
+    send_sms_engage(phone, "Thanks for registering for Engage SF, we'll be in touch soon with volunteer opportunities!")
     return render_template("engagesf.html", submitted=True, mobile=mobile)
   else:
     return render_template("engagesf.html", submitted=False, mobile=mobile)
@@ -235,6 +236,13 @@ def send_sms(phone_number, message):
 
 def send_sms_background(phone_number, message):
   twilio.messages.create(to=phone_number, from_='+16502521370', body=message)
+
+def send_sms_engage(phone_number, message):
+  p = multiprocessing.Process(target=send_sms_engage_background, args=(phone_number, message))
+  p.start()
+
+def send_sms_engage_background(phone_number, message):
+  twilio.messages.create(to=phone_number, from_='+16503013881', body=message)
 
 #TODO lookup numbers on twilio
 # https://www.twilio.com/lookup
