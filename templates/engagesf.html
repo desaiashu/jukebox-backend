@@ -1,0 +1,165 @@
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Manuale|Prompt:700" rel="stylesheet">
+
+  <style type="text/css">
+    html {
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+
+    html, body {
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+}
+
+.container {
+    width:100%;
+}
+
+.column {
+    height: 100%;
+    width:50%;
+    margin: auto;
+    position: relative;
+}
+
+.column .info {
+  width:100%;
+  position:relative;
+  transform: translate3d(0%, 0%, 0);
+}
+
+.column img {
+    width:60%;
+    position: relative;
+    max-width: 60%;
+    left: 50%;
+    transform: translate3d(-43.5%, 10%, 0);
+}
+
+.column .music {
+    width:100%;
+    position:relative;
+    transform: translate3d(0%, 0%, 0);
+}
+
+.column iframe {
+      width:60%;
+      position: relative;
+      max-width: 60%;
+      height:25vw;
+      max-height:25vw;
+      left: 50%;
+      transform: translate3d(-43.5%, 42.5%, 0);
+  }
+
+.column .header {
+    background-color: #fff;
+    width: 57%;
+    transform: translate3d(0, 80%, 0);
+}
+
+.column .header h1 {
+  padding-left: 7%;
+  font-size: 5vw;
+  font-family: 'Prompt', sans-serif;
+  font-weight: bold;
+  color: #696097;
+}
+
+.column .subheader {
+    background-color: #fff;
+    width: 87%;
+    transform: translate3d(0, 120%, 0);
+}
+
+.column .subheader h2 {
+  padding-left: 2.25%;
+  font-size: 1.5vw;
+  font-family: 'Manuale', serif;
+  font-weight: normal;
+  color: #696097;
+}
+
+.column .confirmation {
+    background-color: #fff;
+    width: 87%;
+    transform: translate3d(19.5%, 420%, 0);
+}
+
+.column .confirmation h2 {
+  padding-left: 2.25%;
+  font-size: 1.5vw;
+  font-family: 'Manuale', serif;
+  font-weight: normal;
+  color: #696097;
+}
+
+.column input {
+  background-color: #fff;
+  border: none;
+
+  width: 55.5%;
+  transform: translate3d(0, 160%, 0);
+
+  padding-left: 2%;
+  padding-top: 2.5%;
+  padding-bottom: 2.5%;
+  font-size: 1.5vw;
+  font-family: 'Manuale', serif;
+  font-weight: normal;
+  color: #696097;
+}
+
+.column button {
+  border: none;
+  background-color: #9185B9;
+  width: 27%;
+  transform: translate3d(0%, 160%, 0);
+
+  padding-left: 1%;
+  padding-top: 2.5%;
+  padding-bottom: 2.5%;
+  font-size: 1.5vw;
+  font-family: 'Manuale', serif;
+  font-weight: normal;
+  color: #fff;
+}
+
+.column button:hover {
+  cursor: pointer;
+  background-color: 696097;
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="column">
+      <div class="info">
+        <div class="header">
+          <h1>Engage SF</h1>
+        </div>
+        <div class="subheader">
+            <h2>Actionable, impactful volunteer opportunities sent directly to your phone twice per month</h2>
+        </div>
+        <form id="form" action ="." method="post">
+          {% if submitted %}
+            <div class="confirmation">
+              <h2>Thanks for your support! We'll be in touch soon with volunteer opportunities :)</h2>
+            </div>
+          {% else %}
+
+          <input name="phone" id="phone" placeholder="Enter phone number">
+          <button type="submit">Sign Up</button>
+          {% endif %}
+        </form>
+      </div>
+    </div>
+</div>
+</body>

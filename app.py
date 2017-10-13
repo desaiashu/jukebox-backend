@@ -42,6 +42,7 @@ songs = db.songs
 notify_emails = db.notify_emails
 notify_numbers = db.notify_numbers
 toshbeats_numbers = db.toshbeats_numbers
+engagesf_signups = db.engagesf_signups
 
 TWILIO_SID = os.environ.get('TWILIO_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
@@ -67,6 +68,8 @@ def authenticate(f):
 
 @app.route('/', methods=['GET', 'POST'])
 def base():
+  if 'engagesf' in request.url:
+    return engagesf()
   if 'toshbeats' in request.url:
     return toshbeats()
   if request.method == 'POST':
@@ -91,6 +94,19 @@ def toshbeats():
     return render_template(template, submitted=True)
   else:
     return render_template(template, submitted=False)
+
+def engageSF():
+  if request.user_agent.platform in ['iphone', 'ipad', 'android']:
+    mobile = True
+  else:
+    mobile = False
+  if request.method == 'POST':
+    phone = request.form['phone']
+    #need to grab HTTP headers / referrer
+    engagesf_signups.insert({'phone_number':phone})
+    return render_template("engagesf.html", submitted=True, mobile=mobile)
+  else:
+    return render_template("engagesf.html", submitted=False, mobile=mobile)
 
 @app.route('/testpush')
 def testpush():
