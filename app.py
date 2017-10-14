@@ -95,19 +95,30 @@ def toshbeats():
   else:
     return render_template(template, submitted=False)
 
-def engageSF():
+@app.route('/<any(ashu, makeschool, hotelcalifornia):code>', methods=['GET', 'POST'])
+def engageSF_code(code): #should refactor this to read from a DB
+  print code
+  return engageSF(code)
+
+# see this doc for URL routing needed for link tracking - http://werkzeug.pocoo.org/docs/0.12/routing/
+
+def engageSF(partner="None"):
   if request.user_agent.platform in ['iphone', 'ipad', 'android']:
     mobile = True
   else:
     mobile = False
   if request.method == 'POST':
+    print partner
     phone = request.form['phone']
     #need to grab HTTP headers / referrer
-    engagesf_signups.insert({'phone_number':phone})
+    user = dict(request.headers)
+    user['phone_number'] = phone
+    user['partner'] = partner
+    engagesf_signups.insert(user)
     send_sms_engage(phone, "Thanks for registering for Engage SF, we'll be in touch soon with volunteer opportunities!")
     return render_template("engagesf.html", submitted=True, mobile=mobile)
   else:
-    return render_template("engagesf.html", submitted=False, mobile=mobile)
+    return render_template("engagesf.html", submitted=False, mobile=mobile, partner=partner)
 
 @app.route('/testpush')
 def testpush():
@@ -242,7 +253,7 @@ def send_sms_engage(phone_number, message):
   p.start()
 
 def send_sms_engage_background(phone_number, message):
-  twilio.messages.create(to=phone_number, from_='+16503013881', body=message)
+  twilio.messages.create(to=phone_number, from_='+14153013881', body=message)
 
 #TODO lookup numbers on twilio
 # https://www.twilio.com/lookup

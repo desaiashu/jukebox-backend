@@ -1,5 +1,6 @@
 <head>
     <link href="https://fonts.googleapis.com/css?family=Manuale|Nunito+Sans:900" rel="stylesheet">
+    <title>Engage SF</title>
     <meta property="og:title" content="Engage SF"/>
     <meta property="og:description" content="Actionable, impactful volunteer opportunities sent directly to your phone twice per month"/>
     <meta property="og:image" content="https://engagesf.org/static/engage.png"/>
@@ -28,7 +29,7 @@
 .column {
     height: 100%;
     {% if mobile %}
-    width:90%;
+    width:100%;
     {% else %}
     width:50%;
     {% endif %}
@@ -80,7 +81,7 @@
 .column .header h1 {
   padding-left: 7%;
   {% if mobile %}
-    font-size: 9vw;
+    font-size: 10vw;
     {% else %}
     font-size: 5vw;
     {% endif %}
@@ -98,7 +99,7 @@
 .column .subheader h2 {
   padding-left: 2.25%;
   {% if mobile %}
-    font-size: 2.7vw;
+    font-size: 3vw;
     {% else %}
     font-size: 1.5vw;
     {% endif %}
@@ -111,13 +112,18 @@
 .column .description {
     background-color: #fff;
     width: 87%;
+    {% if mobile %}
+    transform: translate3d(0, 60%, 0);
+    {% else %}
     transform: translate3d(0, 80%, 0);
+    {% endif %}
+    
 }
 
 .column .description p {
   padding-left: 2.25%;
   {% if mobile %}
-    font-size: 1.8vw;
+    font-size: 3vw;
     {% else %}
     font-size: 1vw;
     {% endif %}
@@ -135,7 +141,7 @@
 .column .confirmation h2 {
   padding-left: 2.25%;
   {% if mobile %}
-    font-size: 2.7vw;
+    font-size: 3vw;
     {% else %}
     font-size: 1.5vw;
     {% endif %}
@@ -155,7 +161,7 @@
   padding-top: 2.5%;
   padding-bottom: 2.5%;
   {% if mobile %}
-    font-size: 2.7vw;
+    font-size: 3vw;
     {% else %}
     font-size: 1.5vw;
     {% endif %}
@@ -174,7 +180,7 @@
   padding-top: 2.5%;
   padding-bottom: 2.5%;
   {% if mobile %}
-    font-size: 2.7vw;
+    font-size: 3vw;
     {% else %}
     font-size: 1.5vw;
     {% endif %}
@@ -189,6 +195,34 @@
 }
 
   </style>
+
+  <script type="text/javascript">
+  (function(e,t){var n=e.amplitude||{_q:[],_iq:{}};var r=t.createElement("script")
+  ;r.type="text/javascript";r.async=true
+  ;r.src="https://d24n15hnbwhuhn.cloudfront.net/libs/amplitude-3.7.0-min.gz.js"
+  ;r.onload=function(){if(e.amplitude.runQueuedFunctions){
+  e.amplitude.runQueuedFunctions()}else{
+  console.log("[Amplitude] Error: could not load SDK")}}
+  ;var i=t.getElementsByTagName("script")[0];i.parentNode.insertBefore(r,i)
+  ;function s(e,t){e.prototype[t]=function(){
+  this._q.push([t].concat(Array.prototype.slice.call(arguments,0)));return this}}
+  var o=function(){this._q=[];return this}
+  ;var a=["add","append","clearAll","prepend","set","setOnce","unset"]
+  ;for(var u=0;u<a.length;u++){s(o,a[u])}n.Identify=o;var c=function(){this._q=[]
+  ;return this}
+  ;var l=["setProductId","setQuantity","setPrice","setRevenueType","setEventProperties"]
+  ;for(var p=0;p<l.length;p++){s(c,l[p])}n.Revenue=c
+  ;var d=["init","logEvent","logRevenue","setUserId","setUserProperties","setOptOut","setVersionName","setDomain","setDeviceId","setGlobalUserProperties","identify","clearUserProperties","setGroup","logRevenueV2","regenerateDeviceId","logEventWithTimestamp","logEventWithGroups","setSessionId"]
+  ;function v(e){function t(t){e[t]=function(){
+  e._q.push([t].concat(Array.prototype.slice.call(arguments,0)))}}
+  for(var n=0;n<d.length;n++){t(d[n])}}v(n);n.getInstance=function(e){
+  e=(!e||e.length===0?"$default_instance":e).toLowerCase()
+  ;if(!n._iq.hasOwnProperty(e)){n._iq[e]={_q:[]};v(n._iq[e])}return n._iq[e]}
+  ;e.amplitude=n})(window,document);
+
+  amplitude.getInstance().init("d1392a2ba6f6273e78ea8dffd509a67c");
+</script>
+
 </head>
 
 <body>
@@ -201,7 +235,7 @@
         <div class="subheader">
             <h2>Actionable, impactful volunteer opportunities sent directly to your phone twice per month</h2>
         </div>
-        <form id="form" action ="." method="post">
+        <form id="form" method="post" onsubmit="amplitude.getInstance().logEvent('Sign Up'); amplitude.identify(amplitude.Identify().set('Phone Number', document.getElementById('phone').value).set('Partner', '{% partner %}'))); ">
           {% if submitted %}
             <div class="confirmation">
               <h2>Thanks for your support! We'll be in touch soon with volunteer opportunities :)</h2>
