@@ -116,8 +116,9 @@ def engageSF(partner="None"):
     user['partner'] = partner
     engagesf_signups.insert(user)
     send_sms_engage(phone, "Thanks for registering for Engage SF, we'll be in touch soon with volunteer opportunities!")
-    return render_template("engagesf.html", submitted=True, mobile=mobile)
+    return render_template("engagesf.html", submitted=True, mobile=mobile, partner=partner)
   else:
+    print partner
     return render_template("engagesf.html", submitted=False, mobile=mobile, partner=partner)
 
 @app.route('/testpush')

@@ -235,7 +235,7 @@
         <div class="subheader">
             <h2>Actionable, impactful volunteer opportunities sent directly to your phone twice per month</h2>
         </div>
-        <form id="form" method="post" onsubmit="amplitude.getInstance().logEvent('Sign Up'); amplitude.identify(amplitude.Identify().set('Phone Number', document.getElementById('phone').value).set('Partner', '{% partner %}'))); ">
+        <form id="form" method="post" onsubmit="amplitude.getInstance().logEvent('Sign Up'); amplitude.identify(amplitude.Identify().set('Phone Number', document.getElementById('phone').value).set('Partner', '{{ partner }}'))); ">
           {% if submitted %}
             <div class="confirmation">
               <h2>Thanks for your support! We'll be in touch soon with volunteer opportunities :)</h2>
