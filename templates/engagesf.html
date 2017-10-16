@@ -221,6 +221,8 @@
   ;e.amplitude=n})(window,document);
 
   amplitude.getInstance().init("d1392a2ba6f6273e78ea8dffd509a67c");
+  amplitude.getInstance().logEvent("Page Loaded", {'Partner': '{{ partner }}'});
+  console.log('yay');
 </script>
 
 </head>
@@ -235,7 +237,15 @@
         <div class="subheader">
             <h2>Actionable, impactful volunteer opportunities sent directly to your phone twice per month</h2>
         </div>
-        <form id="form" method="post" onsubmit="amplitude.getInstance().logEvent('Sign Up'); amplitude.identify(amplitude.Identify().set('Phone Number', document.getElementById('phone').value).set('Partner', '{{ partner }}'))); ">
+        <form id="form" method="post" onsubmit="
+
+        amp = amplitude.getInstance(); 
+        params = {'Phone Number': document.getElementById('phone').value, 'Partner': '{{ partner }}'}; 
+        amp.logEvent('Sign Up', params); 
+        amp.setUserProperties(params);">
+
+
+<!--         amplitude.identify(amplitude.Identify().set('Phone Number', document.getElementById('phone').value).set('Partner', '{{ partner }}'))); "> -->
           {% if submitted %}
             <div class="confirmation">
               <h2>Thanks for your support! We'll be in touch soon with volunteer opportunities :)</h2>
