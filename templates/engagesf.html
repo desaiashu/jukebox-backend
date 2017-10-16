@@ -221,7 +221,10 @@
   ;e.amplitude=n})(window,document);
 
   amplitude.getInstance().init("d1392a2ba6f6273e78ea8dffd509a67c");
-  amplitude.getInstance().logEvent("Page Loaded", {'Partner': '{{ partner }}'});
+
+  {% if not submitted %}
+  amplitude.getInstance().logEvent("Page Viewed", {'Partner': '{{ partner }}'});
+  {% endif %}
   console.log('yay');
 </script>
 
