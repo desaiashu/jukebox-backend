@@ -95,7 +95,7 @@ def toshbeats():
   else:
     return render_template(template, submitted=False)
 
-@app.route('/<any(ashu, makeschool, hotelcalifornia):code>', methods=['GET', 'POST'])
+@app.route('/<any(ashu, drew, makeschool, hotelcalifornia, holberton, missionu, minerva):code>', methods=['GET', 'POST'])
 def engageSF_code(code): #should refactor this to read from a DB
   print code
   return engageSF(code)
