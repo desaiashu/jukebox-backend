@@ -113,6 +113,7 @@ def engageSF(partner="None"):
     #need to grab HTTP headers / referrer
     user = dict(request.headers)
     user['phone_number'] = phone
+    user['time'] = int(time.time())
     user['partner'] = partner
     engagesf_signups.insert(user)
     send_sms_engage(phone, "Thanks for registering for Engage SF, we'll be in touch soon with volunteer opportunities!")
