@@ -113,7 +113,7 @@
     background-color: #fff;
     width: 87%;
     {% if mobile %}
-    transform: translate3d(0, 60%, 0);
+    transform: translate3d(0, 50%, 0);
     {% else %}
     transform: translate3d(0, 80%, 0);
     {% endif %}
@@ -135,7 +135,11 @@
 .column .confirmation {
     background-color: #fff;
     width: 87%;
-    transform: translate3d(0, 220%, 0);
+    {% if mobile %}
+    transform: translate3d(0, 200%, 0);
+    {% else %}
+    transform: translate3d(0, 180%, 0);
+    {% endif %}
 }
 
 .column .confirmation h2 {
