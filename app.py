@@ -97,12 +97,6 @@ def toshbeats():
 
 @app.route('/<any(ashu, drew, makeschool, hotelcalifornia, holberton, missionu, minerva, jeremy, numid):code>', methods=['GET', 'POST'])
 def engageSF_code(code): #should refactor this to read from a DB
-  if code == 'numid':
-    i = 1
-    for s in engagesf_signups.find():
-      s['num_id'] = i
-      engagesf_signups.save(s)
-      i+=1
   return engageSF(code)
 
 # see this doc for URL routing needed for link tracking - http://werkzeug.pocoo.org/docs/0.12/routing/
