@@ -95,8 +95,14 @@ def toshbeats():
   else:
     return render_template(template, submitted=False)
 
-@app.route('/<any(ashu, drew, makeschool, hotelcalifornia, holberton, missionu, minerva):code>', methods=['GET', 'POST'])
+@app.route('/<any(ashu, drew, makeschool, hotelcalifornia, holberton, missionu, minerva, jeremy, numid):code>', methods=['GET', 'POST'])
 def engageSF_code(code): #should refactor this to read from a DB
+  if code == 'numid':
+    i = 1
+    for s in engagesf_signups.find():
+      s['num_id'] = i
+      engagesf_signups.save(s)
+      i+=1
   return engageSF(code)
 
 # see this doc for URL routing needed for link tracking - http://werkzeug.pocoo.org/docs/0.12/routing/
@@ -113,6 +119,7 @@ def engageSF(partner="None"):
     user['phone_number'] = phone
     user['time'] = int(time.time())
     user['partner'] = partner
+    user['num_id'] = engagesf_signups.count()+1
     engagesf_signups.insert(user)
     send_sms_engage(phone, "Thanks for registering for Engage SF, we'll be in touch soon with volunteer opportunities!")
     return render_template("engagesf.html", submitted=True, mobile=mobile, partner=partner)
