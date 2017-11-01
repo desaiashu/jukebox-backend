@@ -103,8 +103,8 @@ def engageSF_code(code): #should refactor this to read from a DB
 @app.route('/text/<text_id>')
 def send_text(text_id):
   if text_id == 'a':
-    #for s in engagesf_signups.find():
-    for s in [{'phone_number':'6504305130', 'num_id':1000}]:
+    for s in engagesf_signups.find():
+    #for s in [{'phone_number':'6504305130', 'num_id':1000}]:
       if s['phone_number'] == '':
         continue
       #grab or create the links object for this user
