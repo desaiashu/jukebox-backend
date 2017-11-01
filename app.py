@@ -98,13 +98,13 @@ def toshbeats():
 
 @app.route('/<any(ashu, drew, makeschool, hotelcalifornia, holberton, missionu, minerva, jeremy, clean):code>', methods=['GET', 'POST'])
 def engageSF_code(code): #should refactor this to read from a DB
-  if code == 'clean':
-    i = 1
-    for s in engagesf_signups.find():
-      s['num_id'] = i
-      engagesf_signups.save(s)
-      i+=1
-    return 'Cleaned'
+  # if code == 'clean':
+  #   i = 1
+  #   for s in engagesf_signups.find():
+  #     s['num_id'] = i
+  #     engagesf_signups.save(s)
+  #     i+=1
+  #   return 'Cleaned'
   return engageSF(code)
 
 @app.route('/text/<text_id>')
