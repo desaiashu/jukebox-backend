@@ -98,20 +98,13 @@ def toshbeats():
 
 @app.route('/<any(ashu, drew, makeschool, hotelcalifornia, holberton, missionu, minerva, jeremy, clean):code>', methods=['GET', 'POST'])
 def engageSF_code(code): #should refactor this to read from a DB
-  # if code == 'clean':
-  #   i = 1
-  #   for s in engagesf_signups.find():
-  #     s['num_id'] = i
-  #     engagesf_signups.save(s)
-  #     i+=1
-  #   return 'Cleaned'
   return engageSF(code)
 
 @app.route('/text/<text_id>')
 def send_text(text_id):
   if text_id == 'test':
-    for s in engagesf_signups.find():
-    #for s in [{'phone_number':'6504305130', 'num_id':1000}]:
+    #for s in engagesf_signups.find():
+    for s in [{'phone_number':'6504305130', 'num_id':1000}]:
       if s['phone_number'] == '':
         continue
       #grab or create the links object for this user
@@ -128,7 +121,7 @@ def send_text(text_id):
         engagesf_links.save(l)
         #send text to numbers
         message = "Engage SF’s first initiative is to support victims of the North Bay fire. The fire was one of the most devastating events in California history, with 9,000 buildings burned down, and 100,000 evacuated citizens. Your support will make a difference!\r\rVolunteer\rJoin us at our first volunteer day from 11a-4p on Saturday to help a donations warehouse with intake and sorting, followed by optional dinner and drinks to support a local business:\r"+v_link+"\r\rDonate\rIf you’re unable to make it out this weekend, please consider making a donation to the Redwood Credit Union Community Fund - 100% of your donation will go to disaster relief:\r"+d_link
-        #send_sms_engage(s['phone_number'], message)
+        send_sms_engage(s['phone_number'], message)
   return 'Complete'
 
 @app.route('/v/<link>')
