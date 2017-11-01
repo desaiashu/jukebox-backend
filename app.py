@@ -107,7 +107,7 @@ def send_text(text_id):
     for s in [{'phone_number':'6504305130', 'num_id':1000}]:
 
       #grab or create the links object for this user
-      l = engagesf_links.find_one({'num_id'})
+      l = engagesf_links.find_one({'num_id': s['num_id']})
       if not l:
         l = {'phone_number':s['phone_number'], 'num_id':s['num_id']}
         engagesf_links.insert(l)
