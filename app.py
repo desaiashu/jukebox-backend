@@ -117,7 +117,7 @@ def send_text(text_id):
         v_link = 'engagesf.org/v/a'+str(s['num_id'])
         d_link = 'engagesf.org/v/a'+str(s['num_id'])
         l['a'] = {'v': 0, 'd': 0, 'v_link':'https://www.facebook.com/events/170346770214838/', 'd_link':'https://rcu-community-fund.squarespace.com/donate/'}
-        engage_sf.save(l)
+        engagesf_links.save(l)
         #send text to numbers
         message = "Engage SF’s first initiative is to support victims of the North Bay fire. The fire was one of the most devastating events in California history, with 9,000 buildings burned down, and 100,000 evacuated citizens. Your support will make a difference!\r\rVolunteer\rJoin us at our first volunteer day from 11a-4p on Saturday to help a donations warehouse with intake and sorting, followed by optional dinner and drinks to support a local business:\r"+v_link+"\r\rDonate\rIf you’re unable to make it out this weekend, please consider making a donation to the Redwood Credit Union Community Fund - 100% of your donation will go to disaster relief:\r"+d_link
         send_sms_engage(s['phone_number'], message)
