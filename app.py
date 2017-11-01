@@ -96,8 +96,13 @@ def toshbeats():
   else:
     return render_template(template, submitted=False)
 
-@app.route('/<any(ashu, drew, makeschool, hotelcalifornia, holberton, missionu, minerva, jeremy, numid):code>', methods=['GET', 'POST'])
+@app.route('/<any(ashu, drew, makeschool, hotelcalifornia, holberton, missionu, minerva, jeremy, clean):code>', methods=['GET', 'POST'])
 def engageSF_code(code): #should refactor this to read from a DB
+  if code == 'clean':
+    for s in engagesf_signups.find():
+      s['phone_number'] = s['phone_number'].replace('+', '').replace('(', '').replace(')', '').replace(' ', '').replace('-', '')
+      engagesf_signups.save(s)
+    return 'Cleaned'
   return engageSF(code)
 
 @app.route('/text/<text_id>')
@@ -156,7 +161,7 @@ def engageSF(partner="None"):
     phone = request.form['phone']
     #need to grab HTTP headers / referrer
     user = dict(request.headers)
-    user['phone_number'] = phone
+    user['phone_number'] = phone.replace('+', '').replace('(', '').replace(')', '').replace(' ', '').replace('-', '')
     user['time'] = int(time.time())
     user['partner'] = partner
     user['num_id'] = engagesf_signups.count()+1

@@ -45,7 +45,7 @@
     {% else %}
     transform: translate3d(0%, 0%, 0);
     {% endif %}
-  
+
 }
 
 .column img {
@@ -103,7 +103,7 @@
     {% else %}
     font-size: 2vw;
     {% endif %}
-  
+
   font-family: 'Manuale', serif;
   font-weight: normal;
   color: #696097;
@@ -117,7 +117,7 @@
     {% else %}
     transform: translate3d(0, 80%, 0);
     {% endif %}
-    
+
 }
 
 .column .description p {
@@ -156,7 +156,8 @@
 
 .column input {
   background-color: #fff;
-  border: none;
+  border: 2px lightgrey;
+  border-radius: 20px;
 
   width: 55.5%;
   transform: translate3d(0, 160%, 0);
@@ -176,6 +177,7 @@
 
 .column button {
   border: none;
+  border-radius: 20px;
   background-color: #9185B9;
   width: 27%;
   transform: translate3d(0%, 160%, 0);
@@ -242,13 +244,13 @@
           <h1>Engage SF</h1>
         </div>
         <div class="subheader">
-            <h2>Actionable, impactful volunteer opportunities sent directly to your phone twice per month</h2>
+            <h2>Actionable, impactful volunteer opportunities sent directly to your phone twice a month</h2>
         </div>
         <form id="form" method="post" onsubmit="
 
-        amp = amplitude.getInstance(); 
-        params = {'Phone Number': document.getElementById('phone').value, 'Partner': '{{ partner }}'}; 
-        amp.logEvent('Sign Up', params); 
+        amp = amplitude.getInstance();
+        params = {'Phone Number': document.getElementById('phone').value, 'Partner': '{{ partner }}'};
+        amp.logEvent('Sign Up', params);
         amp.setUserProperties(params);">
 
 
@@ -264,9 +266,9 @@
           {% endif %}
         </form>
         <div class="description">
-          <p>Engage SF is an experiment in making impactful civic engagement easy and accessible. Our communities are filled with empathetic and driven individuals who are eager to be empowered to address the challenges facing our city. Together we can improve the quality of life in San Francisco for all it's citizens.
+          <p>is an experiment in making impactful civic engagement easy and accessible. Our communities are filled with empathetic and driven individuals who are eager to address the challenges facing our city. We aim to empower and mobilize San Franciscans who care so we can improve the quality of life for all its citizens.
             <br><br>
-          Twice a month we'll be sending a curated and vetted list of volunteer opportunities to support community organizations in addressing problems such as the North Bay Fires, Homelessness, Education and Climate Change. We hope you join us in strengthening San Francisco's commmunity through building a better city :)
+          Twice a month we'll be sending a curated and vetted list of volunteer opportunities to support community organizations in addressing problems such as the North Bay Fires, Homelessness, Education and Climate Change. We hope you join us in strengthening San Francisco's community through building a better city :)
           <br><br>
           Ashu, Drew, and friends
         </div>
