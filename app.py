@@ -128,7 +128,7 @@ def clicked_volunteer(link):
   return track_link('v', link)
 
 @app.route('/d/<link>')
-def clicked_donation:
+def clicked_donation(link):
   return track_link('d', link)
 
 def track_link(link_type, link):
