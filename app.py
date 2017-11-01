@@ -99,9 +99,11 @@ def toshbeats():
 @app.route('/<any(ashu, drew, makeschool, hotelcalifornia, holberton, missionu, minerva, jeremy, clean):code>', methods=['GET', 'POST'])
 def engageSF_code(code): #should refactor this to read from a DB
   if code == 'clean':
+    i = 1
     for s in engagesf_signups.find():
-      s['phone_number'] = s['phone_number'].replace('+', '').replace('(', '').replace(')', '').replace(' ', '').replace('-', '')
+      s['num_id'] = i
       engagesf_signups.save(s)
+      i+=1
     return 'Cleaned'
   return engageSF(code)
 
@@ -110,7 +112,8 @@ def send_text(text_id):
   if text_id == 'test':
     for s in engagesf_signups.find():
     #for s in [{'phone_number':'6504305130', 'num_id':1000}]:
-
+      if s['phone_number'] == '':
+        continue
       #grab or create the links object for this user
       l = engagesf_links.find_one({'num_id': s['num_id']})
       if not l:
@@ -158,10 +161,15 @@ def engageSF(partner="None"):
   else:
     mobile = False
   if request.method == 'POST':
-    phone = request.form['phone']
+    phone = request.form['phone'].replace('+', '').replace('(', '').replace(')', '').replace(' ', '').replace('-', '')
+    if phone == '':
+      return render_template("engagesf.html", submitted=False, mobile=mobile, partner=partner)
+    if engagesf_signups.find({'phone_number', phone}).count() > 0:
+      return render_template("engagesf.html", submitted=True, mobile=mobile, partner=partner)
+
     #need to grab HTTP headers / referrer
     user = dict(request.headers)
-    user['phone_number'] = phone.replace('+', '').replace('(', '').replace(')', '').replace(' ', '').replace('-', '')
+    user['phone_number'] = phone
     user['time'] = int(time.time())
     user['partner'] = partner
     user['num_id'] = engagesf_signups.count()+1
