@@ -43,6 +43,7 @@ notify_emails = db.notify_emails
 notify_numbers = db.notify_numbers
 toshbeats_numbers = db.toshbeats_numbers
 engagesf_signups = db.engagesf_signups
+engagesf_links = db.engagesf_links
 
 TWILIO_SID = os.environ.get('TWILIO_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
@@ -98,6 +99,51 @@ def toshbeats():
 @app.route('/<any(ashu, drew, makeschool, hotelcalifornia, holberton, missionu, minerva, jeremy, numid):code>', methods=['GET', 'POST'])
 def engageSF_code(code): #should refactor this to read from a DB
   return engageSF(code)
+
+@app.route('/text/<text_id>')
+def send_text(text_id):
+  if text_id == 'a':
+    #for s in engagesf_signups.find()
+    for s in [{'phone_number':'6504305130', 'num_id':1000}]:
+
+      #grab or create the links object for this user
+      l = engagesf_links.find_one({'num_id'})
+      if not l:
+        l = {'phone_number':s['phone_number'], 'num_id':s['num_id']}
+        engagesf_links.insert(l)
+
+      #if text number a hasn't been sent yet, send
+      if not 'a' in l:
+        v_link = 'engagesf.org/v/a'+str(s['num_id'])
+        d_link = 'engagesf.org/v/a'+str(s['num_id'])
+        l['a'] = {'v': 0, 'd': 0, 'v_link':'https://www.facebook.com/events/170346770214838/', 'd_link':'https://rcu-community-fund.squarespace.com/donate/'}
+        engage_sf.save(l)
+        #send text to numbers
+        message = "Engage SF’s first initiative is to support victims of the North Bay fire. The fire was one of the most devastating events in California history, with 9,000 buildings burned down, and 100,000 evacuated citizens. Your support will make a difference!\r\rVolunteer\rJoin us at our first volunteer day from 11a-4p on Saturday to help a donations warehouse with intake and sorting, followed by optional dinner and drinks to support a local business:\r"+v_link+"\r\rDonate\rIf you’re unable to make it out this weekend, please consider making a donation to the Redwood Credit Union Community Fund - 100% of your donation will go to disaster relief:\r"+d_link
+        send_sms_engage(s['phone_number'], message)
+  return 'Complete'
+
+@app.route('/v/<link>')
+def clicked_volunteer(link):
+  return track_link('v', link)
+
+@app.route('/d/<link>')
+def clicked_donation:
+  return track_link('d', link)
+
+def track_link(link_type, link):
+  #track link, temp redirect
+  num_id = ''.join(i for i in link if i.isdigit())
+  link_id = link.replace(num_id, '')
+  l = engagesf_links.find_one({'num_id':int(num_id)})
+  if not l:
+    return "Link not found :/"
+  if not link_id in l:
+    return "Link not found"
+  link_dict = l[link_id]
+  link_dict[link_type] += 1
+  engagesf_links.save(l)
+  return redirect(link_dict[link_type+'_link'])
 
 # see this doc for URL routing needed for link tracking - http://werkzeug.pocoo.org/docs/0.12/routing/
 
