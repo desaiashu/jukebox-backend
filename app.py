@@ -164,7 +164,7 @@ def engageSF(partner="None"):
     phone = request.form['phone'].replace('+', '').replace('(', '').replace(')', '').replace(' ', '').replace('-', '')
     if phone == '':
       return render_template("engagesf.html", submitted=False, mobile=mobile, partner=partner)
-    if engagesf_signups.find({'phone_number', phone}).count() > 0:
+    if engagesf_signups.find({'phone_number': phone}).count() > 0:
       return render_template("engagesf.html", submitted=True, mobile=mobile, partner=partner)
 
     #need to grab HTTP headers / referrer
