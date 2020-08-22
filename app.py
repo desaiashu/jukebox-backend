@@ -16,12 +16,12 @@ from flask import redirect
 from flask import render_template
 from numbers import Number
 from functools import wraps
-from urlparse import urlparse
+from urllib.parse import urlparse
 from pymongo import MongoClient
 from pymongo import ReturnDocument
 from bson.objectid import ObjectId
-from apns import APNs, Frame, Payload
-from twilio.rest import TwilioRestClient
+from apns3 import APNs, Frame, Payload
+from twilio.rest import Client
 from bugsnag.flask import handle_exceptions
 
 if os.environ.get('DEBUG') == 'True':
@@ -47,7 +47,7 @@ engagesf_links = db.engagesf_links
 
 TWILIO_SID = os.environ.get('TWILIO_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
-twilio = TwilioRestClient(TWILIO_SID, TWILIO_AUTH_TOKEN)
+twilio = Client(TWILIO_SID, TWILIO_AUTH_TOKEN)
 
 app = Flask(__name__)
 
